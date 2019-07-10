@@ -1,0 +1,10 @@
+[program:scrapyd]
+directory=/home/{{user_name}}/{{project}}/scrapy_app/
+environment=SCRAPY_ENV="production"
+command=/home/{{user_name}}/virtualenv/bin/scrapyd -n
+user={{user_name}}
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=syslog
+stderr_logfile=syslog

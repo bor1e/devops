@@ -1,0 +1,15 @@
+---
+  - name: Deploying to Server
+    hosts:
+      - production
+    remote_user: deploy
+    roles:
+      - deploy
+
+  - name: Start Scrapyd as root
+    hosts:
+      - production
+    remote_user: root
+    become: yes
+    roles:
+      - scrapyd

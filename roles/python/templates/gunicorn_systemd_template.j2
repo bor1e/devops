@@ -1,0 +1,19 @@
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User={{user_name}}
+Group=www-data
+PIDFile=/run/gunicorn/pid
+WorkingDirectory=/home/{{user_name}}/{{project}}
+ExecStart=/home/deploy/virtualenv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/{{user_name}}/{{project}}/{{project}}.sock {{project}}.wsgi:application
+
+PrivateTmp=true
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+
+[Install]
+WantedBy=multi-user.target
+
+ 

@@ -1,0 +1,27 @@
+---
+  - name: Initial Configuration
+    hosts:
+      - production
+    remote_user: root
+    become: yes
+    roles:
+      - python # python3, virtualenv, rabbit_mq, gunicorn etc.
+      - nginx # enabling host
+    # - letsencrypt # TODO
+      - db # creating DB
+      - user
+
+  - name: Deploy Application
+    hosts:
+      - production
+    remote_user: deploy
+    roles:
+      - deploy
+
+  - name: Start Scrapyd
+    hosts:
+      - production
+    remote_user: root
+    become: yes
+    roles:
+      - scrapyd

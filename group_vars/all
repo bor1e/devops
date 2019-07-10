@@ -1,0 +1,26 @@
+---
+# roles/nginx
+host: 134.209.228.176
+cname: ci.regios.io
+project: ciregios
+
+# roles/db
+db_name: regios_io
+db_user: regios
+db_password: regiosDB
+
+# roles/user | roles/deploy
+user_name: deploy
+user_groups: ['admin', 'www-data', 'root']
+user_enable_passwordless_sudo: True
+user_generate_ssh_key: False
+user_local_ssh_key_path: "~/.ssh/id_rsa.pub"
+
+#roles/deploy
+requirements: requirements.txt
+git_repo: https://github.com/bor1e/regios.git
+django: 'o2(lkc^c(5fmlhuqnrfttpa8lcx&#uttpa8lcx&*fr$xc)p(xikig5^)hox'
+
+# TODO
+# jenkins
+# celery

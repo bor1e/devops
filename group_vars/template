@@ -1,0 +1,25 @@
+---
+# !!! rename this file in all!!!
+# <ansible_base_dir>/group_vars/all
+
+# roles/nginx
+host: YOUR_IP
+cname: YOUR_DNS
+project: foobar
+
+# roles/db
+db_name: foobar
+db_user: foobar_user
+db_password: foobar_DB
+
+# roles/user | roles/deploy
+user_name: deploy
+user_groups: ['admin', 'www-data', 'root']
+user_enable_passwordless_sudo: True
+user_generate_ssh_key: False
+user_local_ssh_key_path: "~/.ssh/id_rsa.pub"
+
+#roles/deploy
+requirements: requirements.txt
+git_repo: https://github.com/foobar/foobar.git
+django = 'o2(lkc^cfttpa8lcx&x&*fr$#uttpa8lc(5fmlhuqnrfttpa8lcxc)p(xikig5^)hox'

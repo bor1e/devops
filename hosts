@@ -1,0 +1,19 @@
+[production]
+68.183.78.51
+
+# regios.io
+
+[docker]
+46.101.228.37
+
+[jenkins]
+46.101.228.37
+
+[sandbox]
+#
+
+[backup]
+#
+
+[staging]
+#

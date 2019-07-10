@@ -1,0 +1,63 @@
+---
+  - name: get current repo
+    git: >
+      repo="{{git_repo}}"
+      dest="/home/{{user_name}}/{{project}}"
+      force=yes
+
+  - name: create directory structure
+    file: path="/home/{{user_name}}/" state=directory
+    file: path="/home/{{user_name}}/{{item}}" state=directory
+    with_items:
+      - "virtualenv"
+
+  - name: is virtualenv created?
+    stat: path="/home/{{user_name}}/virtualenv/bin/pip"
+    register: pip
+
+  - name: create virtualenv
+    command: virtualenv --python=python3 virtualenv
+    when: pip.stat.exists == False
+
+  - name: update pip requirements
+    command: "/home/{{user_name}}/virtualenv/bin/pip install --upgrade -r /home/{{user_name}}/{{project}}/{{requirements}}"
+
+  #- name: update static files
+  #  command: "/home/{{user_name}}/virtualenv/bin/python3 manage.py collectstatic --noinput"
+  #  args:
+  #    chdir: "/home/{{user_name}}/regios"
+
+  - name: copy settings
+    template: src=settings.j2  dest="/home/{{user_name}}/{{project}}/{{project}}/settings.py"
+
+  - name: make migrations
+    command: "/home/{{user_name}}/virtualenv/bin/python3 manage.py makemigrations"
+    args:
+      chdir: "/home/{{user_name}}/{{project}}"
+
+  - name: run migrations
+    command: "/home/{{user_name}}/virtualenv/bin/python3 manage.py migrate"
+    args:
+      chdir: "/home/{{user_name}}/{{project}}"
+
+  - name: restart gunicorn
+    command: sudo service gunicorn restart
+
+  - name: restart systemctl
+    command: sudo systemctl daemon-reload
+
+  # TODO
+  # - name: restart celery
+  #  command: "/home/{{user_name}}/virtualenv/bin/celery multi restart worker -A config.celery -l info --pidfile=/var/run/regios/%N.pid --logfile=/var/log/regios/%N.log"
+  #  args:
+  #    chdir: "/home/{{user_name}}/regios"
+
+  # - name: stop celery beat
+  #  command: "/home/{{user_name}}/virtualenv/bin/celery multi stop config.celery --pidfile=/var/run/regios/celery_beat.pid"
+  #  args:
+  #    chdir: "/home/{{user_name}}/regios"
+
+  # - name: start celery beat
+  #  command: "/home/{{user_name}}/virtualenv/bin/celery beat -A config.celery --pidfile=/var/run/regios/celery_beat.pid --logfile=/var/log/regios/celery_beat.log --detach"
+  #  args:
+  #    chdir: "/home/{{user_name}}/regios"

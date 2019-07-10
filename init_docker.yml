@@ -1,0 +1,8 @@
+---
+  - name: Initial Configuration
+    hosts:
+      - docker
+    remote_user: root
+    become: yes
+    roles:
+      - docker

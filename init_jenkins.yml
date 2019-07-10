@@ -1,0 +1,9 @@
+---
+  - name: Jenkins Configuration
+    hosts:
+      - jenkins
+    remote_user: root
+    sudo: yes
+    roles:
+  #    - nginx
+      - jenkins

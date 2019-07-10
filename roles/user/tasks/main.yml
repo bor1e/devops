@@ -1,0 +1,32 @@
+---
+  - name: "Create user"
+    user:
+      name: "{{ user_name }}"
+      groups: "{{ (user_groups | join(',')) }}"
+      generate_ssh_key: "{{ user_generate_ssh_key }}"
+      shell: "/bin/bash"
+      
+  - name: "Enable including files from sudoers.d/"
+    lineinfile:
+      path: "/etc/sudoers"
+      regexp: "^#includedir /etc/sudoers.d"
+      line: "#includedir /etc/sudoers.d"
+      state: "present"
+      backup: True
+    when: user_enable_passwordless_sudo
+
+  - name: "Set authorized_key to allow SSH key based logins"
+    authorized_key:
+      user: "{{ user_name }}"
+      key: "{{ lookup('file', user_local_ssh_key_path) }}"
+    when: user_local_ssh_key_path | default(False)
+
+  - name: enable sudo commands for user 'deploy'
+    lineinfile: >
+      dest=/etc/sudoers
+      state=present
+      line='deploy ALL=(ALL) NOPASSWD: {{item}}' validate='visudo -cf %s'
+    with_items:
+      - /usr/sbin/service nginx restart
+      - /usr/sbin/service gunicorn restart
+      - /bin/systemctl daemon-reload

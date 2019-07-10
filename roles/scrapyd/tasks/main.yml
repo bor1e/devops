@@ -1,0 +1,25 @@
+---  
+  ### SCRAPYD
+  - name: install supervisor
+    apt:
+      update_cache: yes
+      state: latest
+      pkg:
+        - supervisor
+    tags:
+      - packages
+
+  - name: configure supervisor
+    template: src=supervisor.conf.j2 dest=/etc/supervisor/conf.d/scrapyd.conf
+
+  - name: scrapyd reread
+    supervisorctl:
+      name: 'scrapyd'
+      state: present
+    become: yes
+
+  - name: scrapyd update
+    supervisorctl: 
+      name: 'scrapyd'
+      state: restarted
+    become: yes

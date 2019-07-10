@@ -1,0 +1,91 @@
+  - name: add jenkins key
+    action: shell wget -q -O - https://jenkins-ci.org/debian/jenkins-ci.org.key | sudo apt-key add -
+
+  - name: add jenkins repository
+    action:  shell sh -c 'echo deb http://pkg.jenkins-ci.org/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+  - name: update packages
+    apt: update_cache=yes
+
+  - name: install Java and Git
+    package:
+      name: ['openjdk-11-jdk', 'git',]
+      state: present
+
+  - name: install python3 packages
+    apt: 
+      name: ['python3', 'python3-dev', 'python3-pip']
+      update_cache: yes 
+      state: present
+    tags: packages
+
+  - name: install virtualenv
+    apt:
+      name: python-virtualenv 
+      state: present
+
+  - name: Install Jenkins
+    apt:
+      name: "jenkins"
+      state: present
+   
+  - name: Allow port 8080
+    shell: iptables -I INPUT -p tcp --dport 8080 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+  - name: Start the server
+    service:
+      name: jenkins
+      state: started
+
+  - name: wait for port
+    wait_for:
+      port: 8080
+
+  - name: Get Admin Password
+    shell: cat /var/lib/jenkins/secrets/initialAdminPassword
+    register: initialAdminPassword
+
+  - name: display initialAdminPassword in Ansible shell
+    debug: 
+      msg: "{{initialAdminPassword.stdout}}"
+
+  - name: Forward port 80 to 8080
+    iptables:
+      table: nat
+      chain: PREROUTING
+      protocol: tcp
+      match: tcp
+      destination_port: 80
+      jump: REDIRECT
+      to_ports: 8080
+      comment: Redirect web traffic to port 8080
+
+  # - name: Forward localhost to 80
+  #   iptables:
+  #     table: nat
+  #     chain: OUTPUT
+  #     protocol: tcp
+  #     match: tcp
+  #     destination: 127.0.0.1
+  #     destination_port: 80
+  #     jump: REDIRECT
+  #     to_ports: 8080
+  #     comment: Redirect web traffic to port 8080
+  # - name: install jenkins
+  #   apt: 
+  #     name: ['jenkins', 'python', 'python3', 'python-dev', 'python3-dev']
+  #     update_cache: yes
+  #     state: present
+  #   tags: packages
+
+  # - name: create folder well known
+  #   file: path=/var/.well-known state=directory
+
+  # - name: create folder badges
+  #   file: path=/var/www/{{host}}/badges state=directory
+
+  # - name: change folder rights
+  #   file: path=/var/www/{{host}}/badges owner=jenkins
+
+  # - name: start jenkins
+  #   service: name=jenkins state=started
